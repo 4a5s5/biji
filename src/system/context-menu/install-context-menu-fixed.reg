@@ -1,0 +1,32 @@
+Windows Registry Editor Version 5.00
+
+; Smart Note Collector - Context Menu Registration (Fixed Version)
+; Add "Add to Notes" option to all files and text selections
+
+; Add context menu for all files
+[HKEY_CLASSES_ROOT\*\shell\SmartNoteCollector]
+@="Add to Notes"
+
+[HKEY_CLASSES_ROOT\*\shell\SmartNoteCollector\command]
+@="\"C:\\Users\\ghc\\Desktop\\新建文件夹 (5)\\笔记\\src\\system\\context-menu\\context-handler.bat\" \"%1\""
+
+; Add context menu for folders
+[HKEY_CLASSES_ROOT\Directory\shell\SmartNoteCollector]
+@="Add to Notes"
+
+[HKEY_CLASSES_ROOT\Directory\shell\SmartNoteCollector\command]
+@="\"C:\\Users\\ghc\\Desktop\\新建文件夹 (5)\\笔记\\src\\system\\context-menu\\context-handler.bat\" \"%1\""
+
+; Add context menu for folder background
+[HKEY_CLASSES_ROOT\Directory\Background\shell\SmartNoteCollector]
+@="Add to Notes"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\SmartNoteCollector\command]
+@="\"C:\\Users\\ghc\\Desktop\\新建文件夹 (5)\\笔记\\src\\system\\context-menu\\context-handler.bat\" \"%V\""
+
+; Add context menu for desktop background
+[HKEY_CLASSES_ROOT\DesktopBackground\Shell\SmartNoteCollector]
+@="Add to Notes"
+
+[HKEY_CLASSES_ROOT\DesktopBackground\Shell\SmartNoteCollector\command]
+@="\"C:\\Users\\ghc\\Desktop\\新建文件夹 (5)\\笔记\\src\\system\\context-menu\\context-handler.bat\" \"%V\""

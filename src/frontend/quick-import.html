@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速导入 - Smart Note Collector</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/quick-import.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="quick-import-body">
+    <div class="quick-import-container">
+        <div class="quick-import-header">
+            <h1>
+                <i class="fas fa-plus-circle"></i>
+                快速导入笔记
+            </h1>
+            <button class="btn-close" id="closeBtn" title="关闭">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="quick-import-content">
+            <form id="quickImportForm">
+                <!-- 内容预览区域 -->
+                <div class="form-group">
+                    <label for="importContent">内容预览</label>
+                    <div class="content-preview" id="contentPreview">
+                        <div class="content-text" id="contentText">
+                            正在加载内容...
+                        </div>
+                        <div class="content-info" id="contentInfo">
+                            <span class="content-length">长度: 0 字符</span>
+                            <span class="content-source" id="contentSource"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 笔记标题 -->
+                <div class="form-group">
+                    <label for="noteTitle">笔记标题</label>
+                    <input type="text" id="noteTitle" name="title" class="form-input" placeholder="输入笔记标题（可选）">
+                </div>
+
+                <!-- 主题选择 -->
+                <div class="form-group">
+                    <label for="noteTheme">选择主题</label>
+                    <select id="noteTheme" name="theme" class="form-select">
+                        <option value="default">默认主题</option>
+                        <!-- 主题选项将通过JavaScript动态加载 -->
+                    </select>
+                </div>
+
+                <!-- 标签 -->
+                <div class="form-group">
+                    <label for="noteTags">标签 (用逗号分隔)</label>
+                    <input type="text" id="noteTags" name="tags" class="form-input" placeholder="例如: 重要, 待办, 学习">
+                </div>
+
+                <!-- 来源信息 -->
+                <div class="source-info" id="sourceInfo" style="display: none;">
+                    <h4><i class="fas fa-info-circle"></i> 来源信息</h4>
+                    <div class="source-details">
+                        <div class="source-item">
+                            <span class="source-label">应用程序:</span>
+                            <span class="source-value" id="sourceApp">未知</span>
+                        </div>
+                        <div class="source-item">
+                            <span class="source-label">窗口标题:</span>
+                            <span class="source-value" id="sourceTitle">未知</span>
+                        </div>
+                        <div class="source-item">
+                            <span class="source-label">时间:</span>
+                            <span class="source-value" id="sourceTime">未知</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="quick-import-footer">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">
+                <i class="fas fa-times"></i>
+                取消
+            </button>
+            <button type="button" class="btn btn-primary" id="saveBtn">
+                <i class="fas fa-save"></i>
+                保存笔记
+            </button>
+        </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>保存中...</p>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/quick-import.js"></script>
+</body>
+</html>

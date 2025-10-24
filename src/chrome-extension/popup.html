@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Note Collector</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <!-- 头部 -->
+        <div class="popup-header">
+            <div class="logo">
+                <span class="logo-icon">📝</span>
+                <span class="logo-text">Smart Note</span>
+            </div>
+            <div class="server-status" id="serverStatus">
+                <span class="status-dot" id="statusDot"></span>
+                <span class="status-text" id="statusText">检查中...</span>
+            </div>
+        </div>
+
+        <!-- 快速添加区域 -->
+        <div class="quick-add-section">
+            <h3>快速添加笔记</h3>
+            
+            <div class="form-group">
+                <label for="noteTitle">标题</label>
+                <input type="text" id="noteTitle" placeholder="输入笔记标题" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="noteContent">内容</label>
+                <textarea id="noteContent" placeholder="输入笔记内容或右键选择网页内容" class="form-textarea" rows="4"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="noteTheme">主题</label>
+                    <select id="noteTheme" class="form-select">
+                        <option value="default">默认主题</option>
+                        <!-- 主题选项将通过JavaScript动态加载 -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="noteTags">标签</label>
+                    <input type="text" id="noteTags" placeholder="用逗号分隔" class="form-input">
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button id="getCurrentPageBtn" class="btn btn-secondary">
+                    <span class="btn-icon">🌐</span>
+                    获取当前页面
+                </button>
+                <button id="saveNoteBtn" class="btn btn-primary">
+                    <span class="btn-icon">💾</span>
+                    保存笔记
+                </button>
+            </div>
+        </div>
+
+        <!-- 最近笔记 -->
+        <div class="recent-notes-section">
+            <h3>最近笔记</h3>
+            <div id="recentNotes" class="recent-notes-list">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 高级功能区域 -->
+        <div class="advanced-features-section">
+            <h3>高级功能</h3>
+            <div class="feature-buttons">
+                <button id="screenshotBtn" class="btn btn-feature">
+                    <span class="btn-icon">📸</span>
+                    <span class="btn-text">截图保存</span>
+                </button>
+                <button id="crawlPageBtn" class="btn btn-feature">
+                    <span class="btn-icon">🕷️</span>
+                    <span class="btn-text">爬取页面</span>
+                </button>
+                <button id="crawlLinkBtn" class="btn btn-feature">
+                    <span class="btn-icon">🔗</span>
+                    <span class="btn-text">爬取链接</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-buttons">
+            <button id="openWebAppBtn" class="btn btn-outline">
+                <span class="btn-icon">🚀</span>
+                打开笔记应用
+            </button>
+            <button id="settingsBtn" class="btn btn-outline">
+                <span class="btn-icon">⚙️</span>
+                设置
+            </button>
+        </div>
+
+        <!-- 使用提示 -->
+        <div class="tips-section">
+            <h4>使用提示</h4>
+            <ul class="tips-list">
+                <li>右键选中文字 → "添加到笔记"</li>
+                <li>右键页面 → "截图添加到笔记"</li>
+                <li>右键链接 → "爬取网页内容到笔记"</li>
+                <li>快捷键 Ctrl+Shift+N 快速添加</li>
+                <li>点击插件图标快速管理</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">处理中...</div>
+    </div>
+
+    <script src="config.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

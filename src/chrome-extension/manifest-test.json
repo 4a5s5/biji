@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Smart Note Collector (Test)",
+  "version": "1.0.1",
+  "description": "测试版本 - 快速收集网页内容到笔记系统",
+  
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "storage",
+    "scripting",
+    "notifications"
+  ],
+  
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://*/*",
+    "http://*/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["test-communication.js"],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Smart Note Collector (Test)"
+  }
+}

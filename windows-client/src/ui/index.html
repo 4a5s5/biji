@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Note Collector</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部工具栏 -->
+        <header class="toolbar">
+            <div class="toolbar-left">
+                <div class="app-title">
+                    <img src="../assets/app-icon.png" alt="Smart Note Collector" class="app-icon">
+                    <h1>Smart Note Collector</h1>
+                </div>
+            </div>
+            
+            <div class="toolbar-center">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="搜索笔记..." class="search-input">
+                    <button id="searchBtn" class="search-btn">🔍</button>
+                </div>
+            </div>
+            
+            <div class="toolbar-right">
+                <div class="server-status" id="serverStatus">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span class="status-text" id="statusText">检查中...</span>
+                </div>
+                <button id="settingsBtn" class="toolbar-btn" title="设置">⚙️</button>
+                <button id="minimizeBtn" class="toolbar-btn" title="最小化">−</button>
+                <button id="closeBtn" class="toolbar-btn close-btn" title="关闭">×</button>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 左侧面板 -->
+            <aside class="sidebar">
+                <!-- 快速操作 -->
+                <section class="quick-actions">
+                    <h3>快速操作</h3>
+                    <div class="action-buttons">
+                        <button id="quickNoteBtn" class="action-btn primary">
+                            <span class="icon">📝</span>
+                            <span class="text">新建笔记</span>
+                        </button>
+                        <button id="screenshotBtn" class="action-btn">
+                            <span class="icon">📷</span>
+                            <span class="text">截图</span>
+                        </button>
+                        <button id="crawlPageBtn" class="action-btn">
+                            <span class="icon">🕷️</span>
+                            <span class="text">爬取网页</span>
+                        </button>
+                        <button id="importBtn" class="action-btn">
+                            <span class="icon">📥</span>
+                            <span class="text">导入文件</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 主题筛选 -->
+                <section class="theme-filter">
+                    <h3>主题筛选</h3>
+                    <div class="theme-list" id="themeList">
+                        <div class="theme-item active" data-theme="all">
+                            <span class="theme-name">全部</span>
+                            <span class="theme-count" id="totalCount">0</span>
+                        </div>
+                        <!-- 主题列表将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="addThemeBtn" class="add-theme-btn">+ 新建主题</button>
+                </section>
+
+                <!-- 剪切板监听状态 -->
+                <section class="clipboard-status">
+                    <h3>剪切板监听</h3>
+                    <div class="clipboard-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="clipboardToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">自动监听剪切板</span>
+                    </div>
+                    <div class="clipboard-info">
+                        <div class="info-item">
+                            <span class="info-label">今日收集:</span>
+                            <span class="info-value" id="todayCount">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">总计:</span>
+                            <span class="info-value" id="totalClipboardCount">0</span>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- 中间内容区域 -->
+            <div class="content-area">
+                <!-- 笔记列表 -->
+                <section class="notes-section">
+                    <div class="section-header">
+                        <h2>笔记列表</h2>
+                        <div class="section-controls">
+                            <select id="sortSelect" class="sort-select">
+                                <option value="updated_at">最近更新</option>
+                                <option value="created_at">创建时间</option>
+                                <option value="title">标题</option>
+                            </select>
+                            <button id="refreshBtn" class="refresh-btn" title="刷新">🔄</button>
+                            <button id="exportBtn" class="export-btn" title="导出">📤</button>
+                        </div>
+                    </div>
+
+                    <div class="notes-container">
+                        <div class="notes-list" id="notesList">
+                            <!-- 笔记列表将通过JavaScript动态生成 -->
+                            <div class="loading-placeholder">
+                                <div class="loading-spinner"></div>
+                                <p>加载中...</p>
+                            </div>
+                        </div>
+
+                        <!-- 分页控件 -->
+                        <div class="pagination" id="pagination" style="display: none;">
+                            <button id="prevPage" class="page-btn">上一页</button>
+                            <span class="page-info">
+                                第 <span id="currentPage">1</span> 页，共 <span id="totalPages">1</span> 页
+                            </span>
+                            <button id="nextPage" class="page-btn">下一页</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 右侧面板 -->
+            <aside class="right-panel" id="rightPanel" style="display: none;">
+                <!-- 笔记详情 -->
+                <section class="note-detail">
+                    <div class="detail-header">
+                        <h3>笔记详情</h3>
+                        <button id="closeDetailBtn" class="close-detail-btn">×</button>
+                    </div>
+                    <div class="detail-content" id="noteDetail">
+                        <!-- 笔记详情内容 -->
+                    </div>
+                </section>
+            </aside>
+        </main>
+
+        <!-- 状态栏 -->
+        <footer class="status-bar">
+            <div class="status-left">
+                <span id="noteCountStatus">总计 0 条笔记</span>
+            </div>
+            <div class="status-center">
+                <span id="operationStatus">就绪</span>
+            </div>
+            <div class="status-right">
+                <span id="timeStatus"></span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 模态对话框 -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-content" id="modalContent">
+                <!-- 模态对话框内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速笔记对话框 -->
+    <div class="quick-note-dialog" id="quickNoteDialog" style="display: none;">
+        <div class="dialog-header">
+            <h3>新建笔记</h3>
+            <button id="closeQuickNoteBtn" class="close-btn">×</button>
+        </div>
+        <form id="quickNoteForm" class="dialog-form">
+            <div class="form-group">
+                <label for="noteTitle">标题</label>
+                <input type="text" id="noteTitle" name="title" placeholder="输入笔记标题" required>
+            </div>
+            <div class="form-group">
+                <label for="noteContent">内容</label>
+                <textarea id="noteContent" name="content" placeholder="输入笔记内容" rows="10" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="noteTheme">主题</label>
+                <select id="noteTheme" name="theme">
+                    <option value="default">默认主题</option>
+                    <!-- 主题选项将动态生成 -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="noteTags">标签</label>
+                <input type="text" id="noteTags" name="tags" placeholder="输入标签，用逗号分隔">
+            </div>
+            <div class="form-actions">
+                <button type="button" id="cancelQuickNoteBtn" class="btn-secondary">取消</button>
+                <button type="submit" class="btn-primary">保存笔记</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 主题选择对话框 -->
+    <div class="theme-dialog" id="themeDialog" style="display: none;">
+        <div class="dialog-header">
+            <h3>保存笔记</h3>
+            <button id="closeThemeDialogBtn" class="close-btn">×</button>
+        </div>
+        <div class="theme-dialog-content">
+            <div class="form-group">
+                <label for="noteEditTitle">标题</label>
+                <input type="text" id="noteEditTitle" name="title" placeholder="请输入标题" required>
+            </div>
+            <div class="form-group">
+                <label for="noteEditContent">内容</label>
+                <textarea id="noteEditContent" name="content" placeholder="请输入内容" rows="8" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="noteEditTags">标签</label>
+                <input type="text" id="noteEditTags" name="tags" placeholder="输入标签，用逗号分隔">
+            </div>
+            <div class="form-group">
+                <label for="themeSelection">主题</label>
+                <div class="theme-selection" id="themeSelection">
+                    <!-- 主题选择内容 -->
+                </div>
+            </div>
+        </div>
+        <div class="dialog-actions">
+            <button id="cancelThemeBtn" class="btn-secondary">取消</button>
+            <button id="confirmThemeBtn" class="btn-primary">保存笔记</button>
+        </div>
+    </div>
+
+    <!-- URL输入对话框 -->
+    <div class="url-dialog" id="urlDialog" style="display: none;">
+        <div class="dialog-header">
+            <h3>爬取网页</h3>
+            <button id="closeUrlDialogBtn" class="close-btn">×</button>
+        </div>
+        <form id="urlForm" class="dialog-form">
+            <div class="form-group">
+                <label for="urlInput">网页地址</label>
+                <input type="url" id="urlInput" name="url" placeholder="https://example.com" required>
+            </div>
+            <div class="form-actions">
+                <button type="button" id="cancelUrlBtn" class="btn-secondary">取消</button>
+                <button type="submit" class="btn-primary">开始爬取</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 通知容器 -->
+    <div class="notifications-container" id="notificationsContainer"></div>
+
+    <!-- 脚本文件 -->
+    <script src="scripts/main.js"></script>
+    <script src="scripts/dialogs.js"></script>
+    <script src="scripts/notes.js"></script>
+    <script src="scripts/themes.js"></script>
+    <script src="scripts/clipboard.js"></script>
+</body>
+</html>

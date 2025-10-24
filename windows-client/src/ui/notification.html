@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剪切板通知</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            user-select: none;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .notification-container {
+            padding: 16px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .notification-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .notification-title {
+            font-size: 14px;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .notification-body {
+            font-size: 12px;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            opacity: 0.9;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .notification-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .notification-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 50px;
+        }
+        
+        .notification-btn.primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        
+        .notification-btn.primary:hover {
+            background: white;
+            transform: translateY(-1px);
+        }
+        
+        .notification-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .notification-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.6);
+            transition: width linear;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .clipboard-preview {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 8px;
+            margin: 6px 0;
+            font-size: 12px;
+            line-height: 1.4;
+            min-height: 1.6em;
+            max-height: calc(1.4em * 3);
+            overflow: hidden;
+            border-left: 3px solid rgba(255, 255, 255, 0.5);
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            white-space: normal;
+        }
+        
+        .clipboard-preview.text {
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-line;
+        }
+        
+        .clipboard-preview.image {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .image-icon {
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+        }
+        
+        /* 动画效果 */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .notification-container.animate-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .notification-icon.animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* 主题变体 */
+        .theme-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .theme-warning {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .theme-error {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+        }
+        
+        .theme-clipboard {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="notification-container" id="notificationContainer">
+        <button class="close-btn" id="closeBtn" title="关闭">×</button>
+        
+        <div class="notification-header">
+            <div class="notification-icon" id="notificationIcon">📋</div>
+            <div class="notification-title" id="notificationTitle">剪切板通知</div>
+        </div>
+        
+        <div class="notification-body" id="notificationBody">
+            检测到剪切板内容变化
+        </div>
+        
+        <div class="clipboard-preview" id="clipboardPreview" style="display: none;">
+            <!-- 剪切板预览内容 -->
+        </div>
+        
+        <div class="notification-buttons" id="notificationButtons">
+            <button class="notification-btn secondary" data-action="ignore">忽略</button>
+            <button class="notification-btn primary" data-action="save">保存</button>
+        </div>
+        
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        let notificationId = null;
+        let progressTimer = null;
+        let duration = 15000;
+        
+        // 监听初始化通知数据
+        ipcRenderer.on('init-notification', (event, data) => {
+            notificationId = data.id;
+            duration = data.duration || 15000;
+            
+            initializeNotification(data);
+            startProgressTimer();
+        });
+        
+        // 初始化通知
+        function initializeNotification(data) {
+            const container = document.getElementById('notificationContainer');
+            const title = document.getElementById('notificationTitle');
+            const body = document.getElementById('notificationBody');
+            const buttonsContainer = document.getElementById('notificationButtons');
+            const preview = document.getElementById('clipboardPreview');
+            const icon = document.getElementById('notificationIcon');
+            
+            // 设置标题和内容
+            title.textContent = data.title || '剪切板通知';
+            body.textContent = data.body || '检测到剪切板内容变化';
+            
+            // 设置图标
+            if (data.data && data.data.type === 'image') {
+                icon.textContent = '🖼️';
+                icon.classList.add('animate-pulse');
+            } else {
+                icon.textContent = '📋';
+                icon.classList.add('animate-pulse');
+            }
+            
+            // 显示剪切板预览
+            if (data.data) {
+                showClipboardPreview(data.data, preview);
+            }
+            
+            // 设置按钮
+            if (data.buttons && data.buttons.length > 0) {
+                buttonsContainer.innerHTML = '';
+                data.buttons.forEach((button, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = `notification-btn ${index === data.buttons.length - 1 ? 'primary' : 'secondary'}`;
+                    btn.textContent = button.text;
+                    btn.setAttribute('data-action', button.action);
+                    buttonsContainer.appendChild(btn);
+                });
+            }
+            
+            // 添加动画
+            container.classList.add('animate-in');
+            
+            // 设置主题
+            if (data.data && data.data.type === 'image') {
+                document.body.className = 'theme-clipboard';
+            } else {
+                document.body.className = 'theme-clipboard';
+            }
+        }
+        
+        // 显示剪切板预览
+        function showClipboardPreview(clipboardData, previewElement) {
+            previewElement.style.display = 'block';
+            
+            if (clipboardData.type === 'text') {
+                previewElement.className = 'clipboard-preview text';
+                const truncatedText = clipboardData.content.length > 120 ? 
+                    clipboardData.content.substring(0, 120) + '...' : 
+                    clipboardData.content;
+                previewElement.textContent = truncatedText;
+            } else if (clipboardData.type === 'image') {
+                previewElement.className = 'clipboard-preview image';
+                previewElement.innerHTML = `
+                    <div class="image-icon">🖼</div>
+                    <span>图片 (${clipboardData.size ? `${clipboardData.size.width}×${clipboardData.size.height}` : '未知尺寸'})</span>
+                `;
+            }
+        }
+        
+        // 开始进度条定时器
+        function startProgressTimer() {
+            const progressBar = document.getElementById('progressBar');
+            const startTime = Date.now();
+            
+            progressBar.style.width = '100%';
+            
+            progressTimer = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, duration - elapsed);
+                const percentage = (remaining / duration) * 100;
+                
+                progressBar.style.width = percentage + '%';
+                
+                if (remaining <= 0) {
+                    clearInterval(progressTimer);
+                    handleAction('timeout');
+                }
+            }, 100);
+        }
+        
+        // 处理操作
+        function handleAction(action) {
+            if (progressTimer) {
+                clearInterval(progressTimer);
+            }
+            
+            if (notificationId) {
+                ipcRenderer.invoke('notification-action', notificationId, action);
+            }
+        }
+        
+        // 关闭通知
+        function closeNotification() {
+            if (progressTimer) {
+                clearInterval(progressTimer);
+            }
+            
+            if (notificationId) {
+                ipcRenderer.invoke('close-notification', notificationId);
+            }
+        }
+        
+        // 事件监听器
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            handleAction('ignore');
+        });
+        
+        // 按钮点击事件
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('notification-btn')) {
+                const action = e.target.getAttribute('data-action');
+                handleAction(action);
+            }
+        });
+        
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                handleAction('ignore');
+            } else if (e.key === 'Enter') {
+                handleAction('save');
+            }
+        });
+        
+        // 阻止右键菜单
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        
+        // 窗口失去焦点时添加提示效果
+        window.addEventListener('blur', () => {
+            document.body.style.opacity = '0.8';
+        });
+        
+        window.addEventListener('focus', () => {
+            document.body.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>

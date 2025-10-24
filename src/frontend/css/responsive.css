@@ -1,0 +1,760 @@
+/* 响应式设计 */
+
+/* 平板设备 */
+@media (max-width: 1024px) {
+    .app-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .header-center {
+        margin: 0 1rem;
+    }
+    
+    .sidebar {
+        width: 250px;
+    }
+    
+    .content-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .notes-container {
+        padding: 1rem 1.5rem;
+    }
+
+    /* 标签筛选响应式 */
+    .tag-filter-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .multi-select-wrapper {
+        min-width: 200px;
+        width: 100%;
+    }
+}
+
+/* 小屏幕平板 */
+@media (max-width: 768px) {
+    .app-header {
+        flex-wrap: wrap;
+        padding: 0.5rem 0.75rem; /* 减少头部内边距 */
+        min-height: auto;
+    }
+
+    .header-left {
+        order: 1;
+        flex: 1;
+    }
+
+    .header-left .app-title {
+        font-size: 1.1rem; /* 进一步减小标题字体 */
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .header-right {
+        order: 2;
+        gap: 0.4rem; /* 减少按钮间距 */
+    }
+
+    .header-right .btn {
+        padding: 0.4rem 0.6rem; /* 压缩按钮尺寸 */
+        font-size: 0.8rem;
+        min-height: auto;
+    }
+
+    .header-center {
+        order: 3;
+        width: 100%;
+        margin: 0.5rem 0 0 0; /* 减少搜索框上边距 */
+        max-width: none;
+    }
+
+    .app-main {
+        flex-direction: column;
+        height: calc(100vh - 100px); /* 减少头部高度预留 */
+        overflow: hidden;
+    }
+
+    .content-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 100px; /* 进一步压缩主题区域高度 */
+        border-right: none;
+        border-bottom: 1px solid #e9ecef;
+        padding: 0.3rem 0; /* 减少内边距 */
+    }
+
+    .themes-list {
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0.2rem 0; /* 减少内边距 */
+        gap: 0.3rem; /* 减少间距 */
+        margin: 0 -0.4rem;
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
+
+    .theme-item {
+        flex-shrink: 0;
+        min-width: 80px; /* 减小最小宽度 */
+        padding: 0.3rem 0.5rem; /* 压缩内边距 */
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 4px;
+        margin: 0;
+        font-size: 0.8rem; /* 减小字体 */
+        white-space: nowrap;
+    }
+
+    .theme-item.active {
+        background: #e3f2fd;
+        border-bottom-color: #3498db;
+    }
+
+    .content-header {
+        flex-direction: row; /* 改为水平布局节省空间 */
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem; /* 减少内边距 */
+    }
+
+    .content-title h2 {
+        font-size: 1.2rem; /* 减小标题字体 */
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .content-actions {
+        display: flex;
+        gap: 0.4rem; /* 减少间距 */
+    }
+
+    .content-actions .btn {
+        padding: 0.4rem 0.6rem; /* 压缩按钮尺寸 */
+        font-size: 0.8rem;
+        min-height: auto;
+    }
+
+    .notes-container {
+        padding: 0.5rem 0.75rem; /* 减少内边距 */
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* 流畅滚动 */
+    }
+
+    /* 手机端标签筛选 - 独立一行，压缩空间 */
+    .filter-section {
+        padding: 0.5rem 0.75rem; /* 适中的内边距 */
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .tag-filter-container {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .filter-label {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        min-width: auto;
+        flex-shrink: 0;
+    }
+
+    .filter-label i {
+        font-size: 0.8rem;
+    }
+
+    .multi-select-wrapper {
+        flex: 1;
+        min-width: 0; /* 允许收缩 */
+        max-width: none;
+    }
+
+    .multi-select-display {
+        padding: 0.5rem 0.75rem;
+        min-height: 36px;
+        font-size: 0.85rem;
+        width: 100%;
+    }
+
+    .multi-select-dropdown {
+        max-height: 200px; /* 移动端减小下拉框高度 */
+    }
+
+    .multi-select-options {
+        max-height: 120px;
+    }
+
+    .multi-select-display .selected-tags {
+        max-width: calc(100% - 20px);
+        overflow: hidden;
+    }
+
+    .multi-select-display .selected-tag {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+    }
+
+    .multi-select-display .placeholder {
+        font-size: 0.85rem;
+    }
+
+    .note-card {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .note-card .note-title {
+        font-size: 1rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+    }
+
+    .note-card .note-content {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+    }
+
+    .note-card .note-meta {
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .note-card .note-tags {
+        margin-bottom: 0.5rem;
+    }
+
+    .note-card .note-tag {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        margin: 2px 4px 2px 0;
+    }
+    
+    .note-actions {
+        position: static;
+        opacity: 1;
+        margin-top: 0.75rem;
+        justify-content: flex-end;
+        gap: 0.4rem;
+    }
+
+    .note-actions .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+        min-height: auto;
+        line-height: 1.2;
+    }
+    
+    /* 底部操作区域优化 */
+    .notes-actions {
+        padding: 0.6rem 1rem;
+        gap: 0.5rem;
+        border-top: 1px solid #e9ecef;
+        background: white;
+    }
+
+    .notes-actions .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        min-height: auto;
+    }
+
+    .pagination {
+        padding: 0.6rem 1rem;
+        gap: 0.4rem;
+        justify-content: center;
+        background: white;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .pagination .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        min-height: auto;
+        min-width: 36px;
+    }
+
+    .pagination select {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        min-height: auto;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* 小屏幕手机设备 - 进一步优化空间利用 */
+@media (max-width: 480px) {
+    /* 整体布局优化 */
+    .app-main {
+        height: calc(100vh - 90px); /* 进一步减少头部占用 */
+    }
+
+    .app-header {
+        padding: 0.4rem 0.6rem; /* 进一步压缩头部 */
+    }
+
+    .header-left .app-title {
+        font-size: 1rem; /* 减小标题字体 */
+    }
+
+    .header-left .app-title i {
+        display: none; /* 隐藏图标节省空间 */
+    }
+
+    .header-right .btn {
+        padding: 0.4rem; /* 更小的按钮 */
+        font-size: 0.75rem;
+    }
+
+    .header-right .btn span {
+        display: none; /* 隐藏按钮文字，只显示图标 */
+    }
+
+    .header-center {
+        margin: 0.3rem 0 0 0; /* 减少搜索框边距 */
+    }
+
+    /* 压缩主题区域 */
+    .sidebar {
+        max-height: 80px; /* 进一步压缩主题区域 */
+        padding: 0.2rem 0;
+    }
+
+    .sidebar-header {
+        display: none; /* 隐藏主题分类标题 */
+    }
+
+    .themes-list {
+        padding: 0.2rem 0;
+        gap: 0.2rem;
+    }
+
+    .theme-item {
+        min-width: 60px; /* 更小的主题项 */
+        padding: 0.2rem 0.3rem;
+        font-size: 0.7rem;
+    }
+
+    /* 压缩内容头部 */
+    .content-header {
+        padding: 0.4rem 0.6rem; /* 进一步压缩 */
+        gap: 0.3rem;
+    }
+
+    .content-title h2 {
+        font-size: 1rem; /* 减小内容标题 */
+    }
+
+    .content-title .note-count {
+        font-size: 0.7rem; /* 减小笔记数量字体 */
+    }
+
+    /* 压缩筛选区域 */
+    .filter-section {
+        padding: 0.4rem 0.6rem; /* 适中的内边距 */
+    }
+
+    .filter-label {
+        font-size: 0.75rem;
+    }
+
+    .multi-select-display {
+        padding: 0.4rem 0.5rem; /* 适中的输入框 */
+        min-height: 30px;
+        font-size: 0.75rem;
+    }
+
+    .multi-select-dropdown {
+        max-height: 180px; /* 小屏幕下减小下拉框高度 */
+    }
+
+    .multi-select-options {
+        max-height: 100px;
+    }
+
+    .multi-select-option {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* 优化笔记列表 - 最大化空间利用 */
+    .notes-container {
+        padding: 0.4rem 0.6rem; /* 减少笔记容器内边距 */
+        flex: 1; /* 确保占用剩余空间 */
+    }
+
+    .note-card {
+        padding: 0.6rem; /* 适中的内边距 */
+        margin-bottom: 0.6rem;
+        border-radius: 6px; /* 减小圆角 */
+    }
+
+    .note-card .note-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem; /* 减少间距 */
+        line-height: 1.3;
+    }
+
+    .note-card .note-content {
+        font-size: 0.8rem; /* 稍大一点的内容字体 */
+        margin-bottom: 0.4rem;
+        line-height: 1.4;
+        -webkit-line-clamp: 2; /* 限制显示行数 */
+    }
+
+    .note-card .note-meta {
+        font-size: 0.7rem;
+        margin-bottom: 0.3rem;
+        gap: 0.4rem;
+    }
+
+    .note-card .note-tag {
+        font-size: 0.65rem;
+        padding: 2px 4px;
+        margin: 2px 3px 2px 0;
+    }
+
+    /* 压缩操作按钮 */
+    .note-actions .btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    /* 压缩底部操作 */
+    .notes-actions {
+        padding: 0.4rem 0.75rem;
+    }
+
+    .notes-actions .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .pagination {
+        padding: 0.4rem 0.75rem;
+    }
+
+    .pagination .btn {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.7rem;
+        min-width: 28px;
+    }
+
+    .pagination select {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.7rem;
+    }
+    
+    .search-input {
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
+        font-size: 0.8rem;
+    }
+    
+    .sidebar-header {
+        padding: 1rem 0.75rem 0.75rem;
+    }
+    
+    .sidebar-header h3 {
+        font-size: 1rem;
+    }
+    
+    .theme-item {
+        min-width: 100px;
+        padding: 0.5rem;
+    }
+    
+    .theme-name {
+        font-size: 0.8rem;
+    }
+    
+    .theme-count {
+        font-size: 0.7rem;
+    }
+    
+    .content-header {
+        padding: 0.75rem;
+    }
+    
+    .content-title h2 {
+        font-size: 1.2rem;
+    }
+    
+    .content-actions .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .notes-container {
+        padding: 0.75rem;
+    }
+    
+    .notes-list {
+        gap: 0.75rem;
+    }
+    
+    .note-card {
+        padding: 0.75rem;
+    }
+    
+    .note-title {
+        font-size: 1rem;
+    }
+    
+    .note-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .note-theme-badge {
+        font-size: 0.7rem;
+    }
+    
+    .note-content {
+        font-size: 0.9rem;
+        -webkit-line-clamp: 2;
+    }
+    
+    .note-tags {
+        gap: 0.25rem;
+    }
+    
+    .note-tag {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .note-actions {
+        gap: 0.5rem;
+    }
+    
+    .note-action-btn {
+        padding: 0.4rem;
+        font-size: 0.8rem;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+    
+    .pagination-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .pagination-info {
+        width: 100%;
+        text-align: center;
+        margin: 0.5rem 0;
+        font-size: 0.8rem;
+    }
+    
+    .modal-content {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        max-height: 100vh;
+    }
+    
+    .modal-header {
+        padding: 1rem 0.75rem 0.75rem;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .modal-body {
+        padding: 0.75rem;
+        max-height: calc(100vh - 140px);
+    }
+    
+    .modal-footer {
+        padding: 0.75rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-textarea {
+        min-height: 100px;
+    }
+    
+    .color-picker {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .color-presets {
+        gap: 0.4rem;
+    }
+    
+    .color-preset {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .toast-container {
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+    }
+    
+    .toast {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.2rem;
+    }
+    
+    .empty-state p {
+        font-size: 0.9rem;
+    }
+}
+
+/* 超小屏幕 */
+@media (max-width: 320px) {
+    .header-left .app-title {
+        font-size: 1rem;
+    }
+    
+    .search-input {
+        padding: 0.4rem 0.6rem 0.4rem 1.8rem;
+    }
+    
+    .theme-item {
+        min-width: 80px;
+        padding: 0.4rem;
+    }
+    
+    .note-card {
+        padding: 0.6rem;
+    }
+    
+    .note-title {
+        font-size: 0.9rem;
+    }
+    
+    .note-content {
+        font-size: 0.8rem;
+    }
+    
+    .modal-body {
+        padding: 0.6rem;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .app-header {
+        padding: 0.5rem 1rem;
+    }
+    
+    .header-left .app-title {
+        font-size: 1.1rem;
+    }
+    
+    .sidebar {
+        max-height: 150px;
+    }
+    
+    .modal-content {
+        max-height: 95vh;
+    }
+    
+    .modal-body {
+        max-height: calc(95vh - 120px);
+    }
+}
+
+/* 打印样式 */
+@media print {
+    .app-header,
+    .sidebar,
+    .content-actions,
+    .note-actions,
+    .pagination,
+    .modal,
+    .toast-container,
+    .loading {
+        display: none !important;
+    }
+    
+    .app-main {
+        flex-direction: column;
+    }
+    
+    .content-area {
+        width: 100%;
+    }
+    
+    .notes-container {
+        padding: 0;
+    }
+    
+    .note-card {
+        border: 1px solid #ddd;
+        margin-bottom: 1rem;
+        break-inside: avoid;
+    }
+    
+    .note-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}

@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Smart Note Collector",
+  "version": "1.0.0",
+  "description": "快速收集网页内容到笔记系统，支持右键菜单和快速添加功能",
+  
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "storage",
+    "scripting",
+    "notifications",
+    "tabs",
+    "offscreen",
+    "<all_urls>"
+  ],
+  
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://*/*",
+    "http://*/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["config.js", "screenshot-selector.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Smart Note Collector",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["popup.html", "styles.css", "screenshot-selector.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

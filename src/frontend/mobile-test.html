@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>移动端优化测试 - Smart Note Collector</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 测试数据样式 */
+        .demo-note {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .demo-note:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .demo-note-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .demo-note-content {
+            color: #495057;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .demo-note-meta {
+            font-size: 0.75rem;
+            color: #6c757d;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .demo-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="app-container">
+        <!-- 头部 -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">
+                    <i class="fas fa-sticky-note"></i>
+                    Smart Note Collector
+                </h1>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <input type="text" placeholder="搜索笔记..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-success">
+                    <i class="fas fa-file-import"></i>
+                    <span>导入笔记</span>
+                </button>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    <span>新建主题</span>
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="app-main">
+            <!-- 侧边栏 - 主题列表 -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3>主题分类</h3>
+                    <button class="btn-icon" title="刷新">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="themes-list">
+                    <div class="theme-item active">
+                        <div class="theme-color" style="background-color: #6c757d"></div>
+                        <div class="theme-info">
+                            <div class="theme-name">全部笔记</div>
+                            <div class="theme-count">32 条笔记</div>
+                        </div>
+                    </div>
+                    <div class="theme-item">
+                        <div class="theme-color" style="background-color: #3498db"></div>
+                        <div class="theme-info">
+                            <div class="theme-name">默认主题</div>
+                            <div class="theme-count">19 条笔记</div>
+                        </div>
+                    </div>
+                    <div class="theme-item">
+                        <div class="theme-color" style="background-color: #e74c3c"></div>
+                        <div class="theme-info">
+                            <div class="theme-name">工作笔记</div>
+                            <div class="theme-count">2 条笔记</div>
+                        </div>
+                    </div>
+                    <div class="theme-item">
+                        <div class="theme-color" style="background-color: #2ecc71"></div>
+                        <div class="theme-info">
+                            <div class="theme-name">学习笔记</div>
+                            <div class="theme-count">11 条笔记</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 内容区域 -->
+            <section class="content-area">
+                <div class="content-header">
+                    <div class="content-title">
+                        <h2>全部笔记</h2>
+                        <span class="note-count">32 条笔记</span>
+                    </div>
+                    <div class="content-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            <span>新建笔记</span>
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-edit"></i>
+                            <span>编辑模式</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 标签筛选区域 - 独立一行 -->
+                <div class="filter-section">
+                    <div class="tag-filter-container">
+                        <label class="filter-label">
+                            <i class="fas fa-tags"></i>
+                            标签筛选:
+                        </label>
+                        <div class="multi-select-wrapper">
+                            <div class="multi-select-display" onclick="toggleDropdown()">
+                                <span class="placeholder">选择标签...</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="multi-select-dropdown" id="tagDropdown">
+                                <div class="multi-select-search">
+                                    <input type="text" placeholder="搜索标签...">
+                                </div>
+                                <div class="multi-select-options">
+                                    <div class="multi-select-option">
+                                        <input type="checkbox" id="tag1">
+                                        <label for="tag1">移动端</label>
+                                    </div>
+                                    <div class="multi-select-option">
+                                        <input type="checkbox" id="tag2">
+                                        <label for="tag2">优化</label>
+                                    </div>
+                                    <div class="multi-select-option">
+                                        <input type="checkbox" id="tag3">
+                                        <label for="tag3">设计</label>
+                                    </div>
+                                    <div class="multi-select-option">
+                                        <input type="checkbox" id="tag4">
+                                        <label for="tag4">UI/UX</label>
+                                    </div>
+                                </div>
+                                <div class="multi-select-actions">
+                                    <button type="button" class="btn-small btn-outline">清空</button>
+                                    <button type="button" class="btn-small btn-primary">应用</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 笔记列表 -->
+                <div class="notes-container">
+                    <div class="notes-list">
+                        <!-- 示例笔记 -->
+                        <div class="demo-note">
+                            <div class="demo-note-title">📝 移动端优化完成</div>
+                            <div class="demo-note-content">
+                                成功优化了移动端笔记列表的空间利用，现在笔记列表占用更大的显示区域，用户体验得到显著提升。主要优化包括压缩头部区域、减少主题分类空间、优化筛选区域等。
+                            </div>
+                            <div class="demo-note-meta">
+                                <span>2小时前</span>
+                                <span class="demo-tag">移动端</span>
+                                <span class="demo-tag">优化</span>
+                            </div>
+                        </div>
+
+                        <div class="demo-note">
+                            <div class="demo-note-title">🎨 界面设计改进</div>
+                            <div class="demo-note-content">
+                                针对移动设备的特点，重新设计了界面布局，确保在小屏幕上也能获得良好的使用体验。采用了响应式设计，适配不同尺寸的移动设备。
+                            </div>
+                            <div class="demo-note-meta">
+                                <span>5小时前</span>
+                                <span class="demo-tag">设计</span>
+                                <span class="demo-tag">UI/UX</span>
+                            </div>
+                        </div>
+
+                        <div class="demo-note">
+                            <div class="demo-note-title">📱 响应式布局实现</div>
+                            <div class="demo-note-content">
+                                使用CSS媒体查询和Flexbox布局，实现了完全响应式的界面设计。在不同屏幕尺寸下都能保持良好的视觉效果和用户体验。
+                            </div>
+                            <div class="demo-note-meta">
+                                <span>1天前</span>
+                                <span class="demo-tag">CSS</span>
+                                <span class="demo-tag">响应式</span>
+                            </div>
+                        </div>
+
+                        <div class="demo-note">
+                            <div class="demo-note-title">⚡ 性能优化策略</div>
+                            <div class="demo-note-content">
+                                通过优化CSS选择器、减少重绘和回流、使用硬件加速等技术手段，显著提升了移动端的渲染性能和交互响应速度。
+                            </div>
+                            <div class="demo-note-meta">
+                                <span>2天前</span>
+                                <span class="demo-tag">性能</span>
+                                <span class="demo-tag">优化</span>
+                            </div>
+                        </div>
+
+                        <div class="demo-note">
+                            <div class="demo-note-title">🔧 开发工具配置</div>
+                            <div class="demo-note-content">
+                                配置了完整的开发环境，包括代码编辑器、调试工具、版本控制等，为高效开发提供了良好的基础设施支持。
+                            </div>
+                            <div class="demo-note-meta">
+                                <span>3天前</span>
+                                <span class="demo-tag">开发</span>
+                                <span class="demo-tag">工具</span>
+                            </div>
+                        </div>
+
+                        <div class="demo-note">
+                            <div class="demo-note-title">📚 学习笔记整理</div>
+                            <div class="demo-note-content">
+                                整理了最近学习的前端技术知识点，包括HTML5新特性、CSS3动画、JavaScript ES6+语法等内容，形成了系统的知识体系。
+                            </div>
+                            <div class="demo-note-meta">
+                                <span>1周前</span>
+                                <span class="demo-tag">学习</span>
+                                <span class="demo-tag">前端</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 简单的交互效果
+        document.querySelectorAll('.demo-note').forEach(note => {
+            note.addEventListener('click', function() {
+                this.style.backgroundColor = '#f8f9fa';
+                setTimeout(() => {
+                    this.style.backgroundColor = '#fff';
+                }, 200);
+            });
+        });
+
+        // 主题切换
+        document.querySelectorAll('.theme-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.theme-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 标签下拉框控制
+        function toggleDropdown() {
+            const dropdown = document.getElementById('tagDropdown');
+            const display = document.querySelector('.multi-select-display');
+
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                display.classList.remove('active');
+            } else {
+                dropdown.classList.add('show');
+                display.classList.add('active');
+            }
+        }
+
+        // 点击外部关闭下拉框
+        document.addEventListener('click', function(event) {
+            const wrapper = document.querySelector('.multi-select-wrapper');
+            const dropdown = document.getElementById('tagDropdown');
+            const display = document.querySelector('.multi-select-display');
+
+            if (!wrapper.contains(event.target)) {
+                dropdown.classList.remove('show');
+                display.classList.remove('active');
+            }
+        });
+
+        // 阻止下拉框内部点击事件冒泡
+        document.getElementById('tagDropdown').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    </script>
+</body>
+</html>

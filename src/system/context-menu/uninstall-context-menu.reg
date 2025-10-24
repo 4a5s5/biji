@@ -1,0 +1,16 @@
+Windows Registry Editor Version 5.00
+
+; Smart Note Collector - Context Menu Uninstaller
+; Remove all context menu items
+
+; Remove file context menu
+[-HKEY_CLASSES_ROOT\*\shell\SmartNoteCollector]
+
+; Remove folder context menu
+[-HKEY_CLASSES_ROOT\Directory\shell\SmartNoteCollector]
+
+; Remove folder background context menu
+[-HKEY_CLASSES_ROOT\Directory\Background\shell\SmartNoteCollector]
+
+; Remove desktop background context menu
+[-HKEY_CLASSES_ROOT\DesktopBackground\Shell\SmartNoteCollector]

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>截图区域选择</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: rgba(0, 0, 0, 0.3);
+            cursor: crosshair;
+            overflow: hidden;
+            user-select: none;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .selection-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .selection-box {
+            position: absolute;
+            border: 2px solid #3498db;
+            background: rgba(52, 152, 219, 0.1);
+            pointer-events: none;
+            display: none;
+        }
+        
+        .selection-info {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            text-align: center;
+            z-index: 1002;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .instructions-text {
+            margin-bottom: 8px;
+        }
+        
+        .instructions-shortcuts {
+            font-size: 11px;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+        
+        .cancel-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 1002;
+            transition: all 0.2s ease;
+        }
+        
+        .cancel-btn:hover {
+            background: rgba(231, 76, 60, 1);
+            transform: translateY(-1px);
+        }
+        
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 1002;
+            transition: all 0.2s ease;
+        }
+        
+        .fullscreen-btn:hover {
+            background: rgba(52, 152, 219, 1);
+            transform: translateX(-50%) translateY(-2px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .corner-handle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #3498db;
+            border: 1px solid white;
+            pointer-events: none;
+            z-index: 1001;
+        }
+        
+        .corner-handle.top-left {
+            top: -4px;
+            left: -4px;
+        }
+        
+        .corner-handle.top-right {
+            top: -4px;
+            right: -4px;
+        }
+        
+        .corner-handle.bottom-left {
+            bottom: -4px;
+            left: -4px;
+        }
+        
+        .corner-handle.bottom-right {
+            bottom: -4px;
+            right: -4px;
+        }
+
+        /* 选择区域控制按钮 */
+        .selection-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .confirm-btn, .adjust-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .confirm-btn {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .confirm-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .adjust-btn {
+            background: #6b7280;
+            color: white;
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+        }
+
+        .adjust-btn:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions" id="instructions">
+        <div class="instructions-text">拖拽选择截图区域</div>
+        <div class="instructions-shortcuts">
+            按住鼠标左键拖拽选择区域 • 按住 Shift 松开可继续调整 • ESC 取消 • Enter 全屏截图
+        </div>
+    </div>
+
+    <!-- 固定按钮 -->
+    <button class="cancel-btn" id="cancelBtn">✕ 取消</button>
+    <button class="fullscreen-btn" id="fullscreenBtn">📷 全屏截图</button>
+
+    <!-- 选择区域确认按钮 (初始隐藏) -->
+    <div class="selection-controls" id="selectionControls" style="display: none;">
+        <button class="confirm-btn" id="confirmBtn">✓ 确认截图</button>
+        <button class="adjust-btn" id="adjustBtn">⚫ 重新选择</button>
+    </div>
+    
+    <div class="selection-overlay">
+        <div class="selection-box" id="selectionBox">
+            <div class="corner-handle top-left"></div>
+            <div class="corner-handle top-right"></div>
+            <div class="corner-handle bottom-left"></div>
+            <div class="corner-handle bottom-right"></div>
+        </div>
+        <div class="selection-info" id="selectionInfo">
+            0 × 0
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        let isSelecting = false;
+        let isResizing = false;
+        let resizeHandle = null;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        
+        const selectionBox = document.getElementById('selectionBox');
+        const selectionInfo = document.getElementById('selectionInfo');
+        const instructions = document.getElementById('instructions');
+        
+        // 鼠标按下开始选择或调整
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 0) { // 左键
+                // 检查是否点击了调整手柄
+                if (e.target.classList.contains('corner-handle')) {
+                    isResizing = true;
+                    resizeHandle = e.target.classList[1]; // 获取角落位置 (top-left, top-right 等)
+                    e.stopPropagation();
+                } else {
+                    isSelecting = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    currentX = e.clientX;
+                    currentY = e.clientY;
+
+                    selectionBox.style.display = 'block';
+                    selectionInfo.style.display = 'block';
+                    instructions.style.display = 'none';
+
+                    updateSelectionBox();
+                }
+            }
+        });
+        
+        // 鼠标移动更新选择框
+        document.addEventListener('mousemove', (e) => {
+            if (isSelecting) {
+                currentX = e.clientX;
+                currentY = e.clientY;
+                updateSelectionBox();
+            } else if (isResizing) {
+                handleResize(e);
+            }
+        });
+
+        // 鼠标释放显示确认按钮
+        document.addEventListener('mouseup', (e) => {
+            if ((isSelecting || isResizing) && e.button === 0) {
+                const width = Math.abs(currentX - startX);
+                const height = Math.abs(currentY - startY);
+                const wasResizing = isResizing;
+
+                isSelecting = false;
+                isResizing = false;
+                resizeHandle = null;
+
+                if (width > 5 && height > 5) {
+                    if (e.shiftKey || wasResizing) {
+                        showSelectionControls();
+                    } else {
+                        completeSelection();
+                    }
+                } else {
+                    resetSelection();
+                }
+            }
+        });
+
+        // 处理调整大小
+        function handleResize(e) {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            switch (resizeHandle) {
+                case 'top-left':
+                    startX = mouseX;
+                    startY = mouseY;
+                    break;
+                case 'top-right':
+                    currentX = mouseX;
+                    startY = mouseY;
+                    break;
+                case 'bottom-left':
+                    startX = mouseX;
+                    currentY = mouseY;
+                    break;
+                case 'bottom-right':
+                    currentX = mouseX;
+                    currentY = mouseY;
+                    break;
+            }
+
+            updateSelectionBox();
+        }
+
+        // 更新选择框显示
+        function updateSelectionBox() {
+            const left = Math.min(startX, currentX);
+            const top = Math.min(startY, currentY);
+            const width = Math.abs(currentX - startX);
+            const height = Math.abs(currentY - startY);
+            
+            selectionBox.style.left = left + 'px';
+            selectionBox.style.top = top + 'px';
+            selectionBox.style.width = width + 'px';
+            selectionBox.style.height = height + 'px';
+            
+            // 更新信息显示
+            selectionInfo.textContent = `${width} × ${height}`;
+            selectionInfo.style.left = (left + 10) + 'px';
+            selectionInfo.style.top = (top + height + 10) + 'px';
+        }
+        
+        // 显示选择控制按钮
+        function showSelectionControls() {
+            const width = Math.abs(currentX - startX);
+            const height = Math.abs(currentY - startY);
+
+            if (width > 10 && height > 10) {
+                instructions.style.display = 'none';
+                document.getElementById('selectionControls').style.display = 'flex';
+                document.getElementById('cancelBtn').style.display = 'none';
+                document.getElementById('fullscreenBtn').style.display = 'none';
+            } else {
+                resetSelection();
+            }
+        }
+
+        // 完成选择
+        function completeSelection() {
+            const left = Math.min(startX, currentX);
+            const top = Math.min(startY, currentY);
+            const width = Math.abs(currentX - startX);
+            const height = Math.abs(currentY - startY);
+
+            const area = { x: left, y: top, width, height };
+
+            // 立即隐藏所有UI元素，避免在截图中显示
+            hideAllUIElements();
+
+            // 发送截图区域信息
+            ipcRenderer.send('screenshot-area-selected', area);
+        }
+
+        // 隐藏所有UI元素
+        function hideAllUIElements() {
+            // 隐藏所有按钮和控件
+            const elementsToHide = [
+                'instructions',
+                'cancelBtn',
+                'fullscreenBtn',
+                'selectionControls',
+                'selectionBox',
+                'selectionInfo'
+            ];
+
+            elementsToHide.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+
+            // 隐藏整个body，这样就不会有任何UI残留
+            document.body.style.opacity = '0';
+        }
+
+        // 重新选择
+        function resetSelection() {
+            // 隐藏选择框和信息
+            selectionBox.style.display = 'none';
+            selectionInfo.style.display = 'none';
+            document.getElementById('selectionControls').style.display = 'none';
+
+            // 显示说明文字和固定按钮
+            instructions.style.display = 'block';
+            document.getElementById('cancelBtn').style.display = 'block';
+            document.getElementById('fullscreenBtn').style.display = 'block';
+
+            // 重置状态
+            isSelecting = false;
+            startX = 0;
+            startY = 0;
+            currentX = 0;
+            currentY = 0;
+        }
+        
+        // 取消选择
+        function cancelSelection() {
+            ipcRenderer.send('screenshot-cancelled');
+        }
+        
+        // 全屏截图
+        function takeFullscreenShot() {
+            const area = {
+                x: 0,
+                y: 0,
+                width: window.screen.width,
+                height: window.screen.height
+            };
+
+            // 立即隐藏所有UI元素
+            hideAllUIElements();
+
+            ipcRenderer.send('screenshot-area-selected', area);
+        }
+        
+        // 事件监听器
+        document.getElementById('cancelBtn').addEventListener('click', cancelSelection);
+        document.getElementById('fullscreenBtn').addEventListener('click', takeFullscreenShot);
+        document.getElementById('confirmBtn').addEventListener('click', completeSelection);
+        document.getElementById('adjustBtn').addEventListener('click', resetSelection);
+        
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                cancelSelection();
+            } else if (e.key === 'Enter') {
+                takeFullscreenShot();
+            }
+        });
+        
+        // 阻止右键菜单
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        
+        // 阻止默认拖拽行为
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+        });
+        
+        // 窗口失去焦点时不立即取消选择，只在用户明确操作时取消
+        // 这样可以避免误触取消
+        /*
+        window.addEventListener('blur', () => {
+            if (isSelecting) {
+                cancelSelection();
+            }
+        });
+        */
+        
+        // 页面加载完成后显示说明
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                instructions.style.display = 'block';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

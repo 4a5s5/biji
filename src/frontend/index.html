@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Smart Notes">
+    <meta name="theme-color" content="#007bff">
+    <meta name="format-detection" content="telephone=no">
+    <title>Smart Note Collector - 智能笔记收集器</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="app-container">
+        <!-- 头部 -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">
+                    <i class="fas fa-sticky-note"></i>
+                    Smart Note Collector
+                </h1>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="搜索笔记..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-success" id="importBtn" onclick="window.open('/import', '_blank')">
+                    <i class="fas fa-file-import"></i>
+                    导入笔记
+                </button>
+                <button class="btn btn-primary" id="newThemeBtn">
+                    <i class="fas fa-plus"></i>
+                    新建主题
+                </button>
+                <button class="btn btn-info" id="exportDataBtn">
+                    <i class="fas fa-download"></i>
+                    导出数据
+                </button>
+                <button class="btn btn-secondary" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                    设置
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="app-main">
+            <!-- 侧边栏 - 主题列表 -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h3>主题分类</h3>
+                    <button class="btn-icon" id="refreshThemesBtn" title="刷新">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="themes-list" id="themesList">
+                    <!-- 主题列表将通过JavaScript动态生成 -->
+                </div>
+            </aside>
+
+            <!-- 内容区域 -->
+            <section class="content-area">
+                <!-- 笔记列表区域 -->
+                <div class="notes-section" id="notesSection">
+                    <div class="content-header">
+                        <div class="content-title">
+                            <h2 id="currentThemeTitle">全部笔记</h2>
+                            <span class="note-count" id="noteCount">0 条笔记</span>
+                        </div>
+                        <div class="content-actions">
+                            <button class="btn btn-primary" id="newNoteBtn">
+                                <i class="fas fa-plus"></i>
+                                新建笔记
+                            </button>
+
+                            <!-- 批量操作按钮 -->
+                            <div class="batch-actions" id="batchActions" style="display: none;">
+                                <button class="btn btn-warning" id="selectAllBtn">
+                                    <i class="fas fa-check-square"></i>
+                                    全选
+                                </button>
+                                <button class="btn btn-success" id="aiAnalyzeBtn">
+                                    <i class="fas fa-brain"></i>
+                                    AI分析
+                                </button>
+                                <button class="btn btn-danger" id="batchDeleteBtn">
+                                    <i class="fas fa-trash"></i>
+                                    批量删除
+                                </button>
+                                <button class="btn btn-info" id="batchExportBtn">
+                                    <i class="fas fa-download"></i>
+                                    批量导出
+                                </button>
+                            </div>
+
+                            <div class="action-group">
+                                <button class="btn btn-outline" id="editModeBtn">
+                                    <i class="fas fa-edit"></i>
+                                    编辑模式
+                                </button>
+
+                                <!-- 每页显示数量设置 -->
+                                <div class="items-per-page">
+                                    <label for="itemsPerPageSelect">每页显示:</label>
+                                    <select id="itemsPerPageSelect" class="form-select-small">
+                                        <option value="10">10条</option>
+                                        <option value="20" selected>20条</option>
+                                        <option value="50">50条</option>
+                                        <option value="100">100条</option>
+                                    </select>
+                                </div>
+
+                                <div class="view-options">
+                                    <button class="btn-icon active" id="listViewBtn" title="列表视图">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                    <button class="btn-icon" id="gridViewBtn" title="网格视图">
+                                        <i class="fas fa-th"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 标签筛选区域 - 独立一行 -->
+                    <div class="filter-section">
+                        <div class="tag-filter-container">
+                            <label for="tagFilter" class="filter-label">
+                                <i class="fas fa-tags"></i>
+                                标签筛选:
+                            </label>
+                            <div class="multi-select-wrapper">
+                                <div class="multi-select-display" id="tagFilterDisplay">
+                                    <span class="placeholder">选择标签...</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="multi-select-dropdown" id="tagFilterDropdown">
+                                    <div class="multi-select-search">
+                                        <input type="text" id="tagSearchInput" placeholder="搜索标签...">
+                                    </div>
+                                    <div class="multi-select-options" id="tagFilterOptions">
+                                        <!-- 标签选项将通过JavaScript动态生成 -->
+                                    </div>
+                                    <div class="multi-select-actions">
+                                        <button type="button" class="btn-small btn-outline" id="clearTagFilter">清空</button>
+                                        <button type="button" class="btn-small btn-primary" id="applyTagFilter">应用</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 笔记列表 -->
+                    <div class="notes-container" id="notesContainer">
+                        <div class="notes-list" id="notesList">
+                            <!-- 笔记列表将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <!-- 分页控件 -->
+                        <div class="pagination" id="pagination">
+                            <!-- 分页将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 空状态 -->
+                    <div class="empty-state" id="emptyState" style="display: none;">
+                        <div class="empty-icon">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <h3>还没有笔记</h3>
+                        <p>开始创建您的第一个笔记吧！</p>
+                        <button class="btn btn-primary" onclick="showNewNoteModal()">
+                            <i class="fas fa-plus"></i>
+                            创建笔记
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 笔记详情阅览区域 -->
+                <div class="note-viewer" id="noteViewer" style="display: none;">
+                    <div class="note-viewer-header">
+                        <div class="note-viewer-title">
+                            <h3 id="viewerNoteTitle">笔记详情</h3>
+                            <div class="note-viewer-meta">
+                                <span class="viewer-theme-badge" id="viewerThemeBadge">
+                                    <span class="viewer-theme-color" id="viewerThemeColor"></span>
+                                    <span id="viewerThemeName">默认主题</span>
+                                </span>
+                                <span class="viewer-date" id="viewerDate"></span>
+                                <span class="viewer-source" id="viewerSource"></span>
+                            </div>
+                        </div>
+                        <div class="note-viewer-actions">
+                            <button class="btn btn-primary" id="editNoteBtn">
+                                <i class="fas fa-edit"></i>
+                                编辑
+                            </button>
+                            <button class="btn btn-secondary" id="closeViewerBtn">
+                                <i class="fas fa-times"></i>
+                                关闭
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="note-viewer-content">
+                        <div class="viewer-tags" id="viewerTags" style="display: none;">
+                            <!-- 标签将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <div class="viewer-image" id="viewerImage" style="display: none;">
+                            <img id="viewerImageElement" src="" alt="笔记图片">
+                        </div>
+                        
+                        <div class="viewer-content-text" id="viewerContentText">
+                            <!-- 笔记内容将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 新建/编辑笔记模态框 -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="noteModalTitle">新建笔记</h3>
+                <button class="btn-close" id="closeNoteModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="noteForm">
+                    <div class="form-group">
+                        <label for="noteTitle">标题</label>
+                        <input type="text" id="noteTitle" name="title" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noteTheme">主题</label>
+                        <select id="noteTheme" name="theme" class="form-select">
+                            <!-- 主题选项将通过JavaScript动态生成 -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noteContent">内容</label>
+                        <textarea id="noteContent" name="content" required class="form-textarea" rows="8"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noteImage">图片（未实现该功能）</label>
+                        <input type="file" id="noteImage" name="image" accept="image/*" class="form-file">
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImg" src="" alt="预览">
+                            <button type="button" class="btn-remove-image" id="removeImageBtn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noteTags">标签 (用逗号分隔)</label>
+                        <input type="text" id="noteTags" name="tags" class="form-input" placeholder="例如: 工作, 重要, 待办">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelNoteBtn">取消</button>
+                <button type="button" class="btn btn-primary" id="saveNoteBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建/编辑主题模态框 -->
+    <div class="modal" id="themeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="themeModalTitle">新建主题</h3>
+                <button class="btn-close" id="closeThemeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="themeForm">
+                    <div class="form-group">
+                        <label for="themeName">主题名称</label>
+                        <input type="text" id="themeName" name="name" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="themeColor">主题颜色</label>
+                        <div class="color-picker">
+                            <input type="color" id="themeColor" name="color" value="#3498db" class="form-color">
+                            <div class="color-presets">
+                                <button type="button" class="color-preset" data-color="#3498db" style="background: #3498db;"></button>
+                                <button type="button" class="color-preset" data-color="#e74c3c" style="background: #e74c3c;"></button>
+                                <button type="button" class="color-preset" data-color="#2ecc71" style="background: #2ecc71;"></button>
+                                <button type="button" class="color-preset" data-color="#f39c12" style="background: #f39c12;"></button>
+                                <button type="button" class="color-preset" data-color="#9b59b6" style="background: #9b59b6;"></button>
+                                <button type="button" class="color-preset" data-color="#1abc9c" style="background: #1abc9c;"></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="themeIcon">图标</label>
+                        <div class="icon-picker">
+                            <select id="themeIcon" name="icon" class="form-select">
+                                <option value="default">默认</option>
+                                <option value="work">工作</option>
+                                <option value="study">学习</option>
+                                <option value="personal">个人</option>
+                                <option value="project">项目</option>
+                                <option value="idea">想法</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelThemeBtn">取消</button>
+                <button type="button" class="btn btn-primary" id="saveThemeBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量导出模态框 -->
+    <div class="modal" id="batchExportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量导出笔记</h3>
+                <button class="btn-close" id="closeBatchExportModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>导出格式:</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="exportFormat" value="json" checked>
+                            <span>JSON格式 (.json)</span>
+                            <small>包含完整的笔记数据结构</small>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="exportFormat" value="txt">
+                            <span>纯文本格式 (.txt)</span>
+                            <small>简洁的文本格式</small>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="exportFormat" value="md">
+                            <span>Markdown格式 (.md)</span>
+                            <small>支持格式化的文档</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="selected-notes-info">
+                    <p>已选择 <span id="selectedNotesCount">0</span> 条笔记</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelBatchExportBtn">取消</button>
+                <button type="button" class="btn btn-primary" id="confirmBatchExportBtn">导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI设置模态框 -->
+    <div class="modal" id="aiSettingsModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>AI分析设置</h3>
+                <button class="btn-close" id="closeAiSettingsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" data-tab="api">API配置</button>
+                        <button class="tab-button" data-tab="presets">预设管理</button>
+                    </div>
+                    
+                    <!-- API配置选项卡 -->
+                    <div class="tab-content active" id="apiTab">
+                        <div class="form-group">
+                            <label for="aiApiUrl">API地址</label>
+                            <input type="text" id="aiApiUrl" class="form-input" placeholder="https://api.openai.com/v1/chat/completions">
+                            <small>支持OpenAI兼容的API接口</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="aiApiKey">API密钥</label>
+                            <div class="input-group">
+                                <input type="password" id="aiApiKey" class="form-input" placeholder="输入您的API密钥">
+                                <button type="button" class="btn btn-outline" id="toggleApiKeyBtn">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="aiModelSelect">选择模型</label>
+                            <div class="input-group">
+                                <select id="aiModelSelect" class="form-select">
+                                    <option value="">请先获取模型列表</option>
+                                </select>
+                                <button type="button" class="btn btn-primary" id="fetchModelsBtn">
+                                    <i class="fas fa-download"></i>
+                                    获取模型
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="aiMaxTokens">最大输出Token数</label>
+                            <input type="number" id="aiMaxTokens" class="form-input" min="100" max="200000" value="65536" placeholder="65536">
+                            <small>控制AI回复的最大长度，建议65536</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enableStreamOutput" class="form-checkbox">
+                                <span class="checkbox-text">启用流式输出</span>
+                            </label>
+                            <small>启用后AI回复将实时显示，类似ChatGPT的打字效果</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="button" class="btn btn-success" id="testAiConnectionBtn">
+                                <i class="fas fa-plug"></i>
+                                测试连接
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 预设管理选项卡 -->
+                    <div class="tab-content" id="presetsTab">
+                        <div class="presets-header">
+                            <h4>预设模板</h4>
+                            <button type="button" class="btn btn-primary" id="addPresetBtn">
+                                <i class="fas fa-plus"></i>
+                                添加预设
+                            </button>
+                        </div>
+                        
+                        <div class="presets-list" id="presetsList">
+                            <!-- 预设列表将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="defaultPresetSelect">默认预设</label>
+                            <select id="defaultPresetSelect" class="form-select">
+                                <option value="">无默认预设</option>
+                            </select>
+                            <small>选择在打开AI对话时自动应用的预设</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelAiSettingsBtn">取消</button>
+                <button type="button" class="btn btn-primary" id="saveAiSettingsBtn">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI对话模态框 -->
+    <div class="modal" id="aiChatModal">
+        <div class="modal-content" style="max-width: 1200px; height: 85vh;">
+            <div class="modal-header">
+                <h3>AI分析对话</h3>
+                <div class="ai-status">
+                    <span id="aiStatusText">准备就绪</span>
+                    <div class="ai-loading" id="aiLoading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+                <button class="btn-close" id="closeAiChatModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; height: 100%;">
+                <!-- 控制栏 - 将所有控件放在同一行 -->
+                <div class="chat-controls-bar">
+                    <div class="chat-controls-left">
+                        <h4 class="chat-title">AI 对话分析</h4>
+                    </div>
+                    <div class="chat-controls-right">
+                        <select id="chatModelSelect" class="form-select-compact">
+                            <option value="">选择模型...</option>
+                        </select>
+                        <select id="chatPresetSelect" class="form-select-compact">
+                            <option value="">选择预设...</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-info btn-sm" id="showChatHistoryBtn">
+                            <i class="fas fa-history"></i>
+                            历史记录
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="clearChatBtn">
+                            <i class="fas fa-trash"></i>
+                            清空对话
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm" id="exportChatBtn">
+                            <i class="fas fa-download"></i>
+                            导出对话
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 对话容器 - 增大高度 -->
+                <div class="chat-container-expanded">
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- 对话消息将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <div class="chat-input-container-footer">
+                    <div class="input-group-footer">
+                        <textarea id="chatInput" class="form-textarea" rows="3" placeholder="输入您的问题或选择预设..."></textarea>
+                        <button type="button" class="btn btn-primary" id="sendChatBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            发送
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer-buttons">
+                    <button type="button" class="btn btn-success" id="saveSelectedChatsBtn">保存选中对话</button>
+                    <button type="button" class="btn btn-secondary" id="closeChatBtn">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI对话历史记录模态框 -->
+    <div class="modal" id="chatHistoryModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>对话历史记录</h3>
+                <button type="button" class="btn-close" id="closeChatHistoryModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="chat-history-list" id="chatHistoryList">
+                    <!-- 历史记录列表将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" id="clearAllHistoryBtn">清空所有历史</button>
+                <button type="button" class="btn btn-secondary" id="closeChatHistoryModalBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预设编辑模态框 -->
+    <div class="modal" id="presetEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="presetEditTitle">编辑预设</h3>
+                <button class="btn-close" id="closePresetEditModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="presetEditForm">
+                    <div class="form-group">
+                        <label for="presetName">预设名称</label>
+                        <input type="text" id="presetName" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="presetPrompt">预设内容</label>
+                        <textarea id="presetPrompt" class="form-textarea" rows="8" required placeholder="在此输入预设内容，使用 {{TEXTS}} 作为笔记内容的占位符"></textarea>
+                        <small>提示：使用 {{TEXTS}} 作为笔记内容的占位符</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelPresetEditBtn">取消</button>
+                <button type="button" class="btn btn-primary" id="savePresetBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/markdown-renderer.js"></script> <!-- Markdown渲染器 -->
+    <script src="js/tag-filter.js"></script>
+    <script src="js/notes.js"></script>
+    <script src="js/themes.js"></script>
+    <script src="js/mobile.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

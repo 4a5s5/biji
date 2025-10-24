@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(dir)",
+      "Bash(find:*)",
+      "Bash(dir:*)",
+      "Bash(node clear-server-config.js)",
+      "Bash(node fix-config.js)",
+      "Bash(node network-diagnosis.js)",
+      "Bash(node probe-api.js)",
+      "Bash(node:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

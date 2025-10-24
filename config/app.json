@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "Smart Note Collector",
+    "version": "1.0.0",
+    "port": 3000,
+    "host": "localhost"
+  },
+  "storage": {
+    "dataPath": "./data",
+    "notesFile": "./data/notes.json",
+    "themesFile": "./data/themes.json",
+    "imagesPath": "./data/images"
+  },
+  "ui": {
+    "theme": "light",
+    "language": "zh-CN",
+    "itemsPerPage": 20
+  },
+  "features": {
+    "autoSave": true,
+    "contextMenu": true,
+    "imageCompression": true,
+    "maxImageSize": "5MB"
+  },
+  "ai": {
+    "apiUrl": "",
+    "apiKey": "",
+    "selectedModel": "",
+    "models": [],
+    "maxTokens": 65536,
+    "presets": [
+      {
+        "id": "summarize",
+        "name": "内容总结",
+        "prompt": "请对以下内容进行总结：\n\n{{TEXTS}}\n\n请提供简洁明了的总结。"
+      },
+      {
+        "id": "analyze",
+        "name": "内容分析",
+        "prompt": "请分析以下内容：\n\n{{TEXTS}}\n\n请从以下角度进行分析：\n1. 主要观点\n2. 关键信息\n3. 可能的应用场景"
+      },
+      {
+        "id": "questions",
+        "name": "生成问题",
+        "prompt": "基于以下内容生成一些思考问题：\n\n{{TEXTS}}\n\n请生成5-10个有助于深入思考的问题。"
+      }
+    ]
+  }
+}
