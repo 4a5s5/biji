@@ -1,0 +1,58 @@
+# 使用官方 Node.js 18 Alpine 镜像作为基础镜像
+FROM node:18-alpine
+
+# 设置 Alpine 镜像源为阿里云镜像
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装系统依赖
+RUN apk add --no-cache \
+    git \
+    curl \
+    && rm -rf /var/cache/apk/*
+
+# 复制 package.json 和 package-lock.json（如果存在）
+COPY package*.json ./
+
+# 设置 npm 镜像源为淘宝镜像
+RUN npm config set registry https://registry.npmmirror.com
+
+# 安装 Node.js 依赖
+RUN npm ci --only=production && npm cache clean --force
+
+# 复制应用程序代码
+COPY . .
+
+# 创建数据目录并设置权限
+RUN mkdir -p data/images uploads && \
+    chown -R node:node data uploads && \
+    chmod -R 755 data uploads
+
+# 创建数据库目录的挂载点
+VOLUME ["/app/data"]
+
+# 安装su-exec用于用户切换
+RUN apk add --no-cache su-exec
+
+# 复制入口点脚本
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# 设置入口点
+ENTRYPOINT ["/entrypoint.sh"]
+
+# 设置环境变量
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# 暴露端口
+EXPOSE 3000
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
+
+# 启动命令
+CMD ["node", "full-server.js"]
